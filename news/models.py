@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.db import models
-# from datetime import datetime
 
 
 class Author(models.Model):
@@ -8,7 +7,16 @@ class Author(models.Model):
     rating = models.IntegerField(default=0)
 
     def update_rating(self):
-        pass
+        r = 0
+        r1 = Post.objects.filter(author_id=self.id).values('rating', 'id')
+        r += sum([i['rating'] for i in r1])  # суманрый рейтинг каждой статьи автора
+        r *= 3
+        r2 = Comment.objects.filter(user_id=self.id).values('rating')
+        r += sum([i['rating'] for i in r2])  # суманрый рейтинг всех комментариев автора
+        r3 = Comment.objects.filter(post__author_id=self.id).values('rating')
+        r += sum([i['rating'] for i in r3])  # суманрый рейтинг всех коментариев к статьям автора
+        self.rating = r
+        self.save()
 
 
 class Category(models.Model):
