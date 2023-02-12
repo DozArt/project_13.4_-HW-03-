@@ -5,7 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Bare - Start Bootstrap Template</title>
+        <title>
+		{% block title %}
+		{{ flatpage.content }}
+		{% endblock title %}
+		</title>
         <!-- Favicon-->
         {% load static %}
         <!-- Core theme CSS (includes Bootstrap)-->
@@ -25,15 +29,12 @@
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item active">
-                            <a class="nav-link" href="#">Home
+                            <a class="nav-link" href="/news/">Home
                                 <span class="sr-only">(current)</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/about/">About</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/contacts/">Contact</a>
+                            <a class="nav-link" href="/news/">News</a>
                         </li>
                     </ul>
                 </div>
