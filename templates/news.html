@@ -2,6 +2,7 @@
 {% extends 'flatpages/default.html' %}
 
 {% load custom_filters %}
+{% load custom_tags %}
 
 <!-- Название у нас будет products -->
 {% block title %}
@@ -10,16 +11,34 @@ All_news
 
 <!-- В контенте на странице мы выводим все товары -->
 {% block content %}
-<h1>Все новости </h1>
-<h2>Новостей: {{ all_news|length }}</h2>
+<h1>Все посты</h1>
 {% for news in all_news %}
 <hr>
 <h2>
-    <a href="/news/{{ news.id }}">
+    <a href="/{{news.essence|translate_essence}}/{{ news.id }}">
         {{ news.header|censor }}
     </a>
 </h2>
 <h5>{{ news.date|date:'d M Y' }}</h5>
 <p>{{ news.text|truncatewords:20|censor}}</p>
 {% endfor %}
+
+{% if page_obj.has_previous %}
+       <a href="?{% url_replace page=1 %}">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {{ page_obj.number }}
+
+   {% if page_obj.has_next %}
+       <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+
 {% endblock content %}

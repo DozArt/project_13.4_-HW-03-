@@ -19,3 +19,11 @@ def censor(value):
 
     t = r.sub(cen, value)  # подмена с использованием функции cen()
     return f'{t}'
+
+
+essence = {'N': 'news', 'A': 'articles'}
+
+
+@register.filter()
+def translate_essence(value):
+    return essence.get(value)
