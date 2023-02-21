@@ -1,5 +1,5 @@
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post
 from .filters import PostFilters
@@ -11,7 +11,7 @@ class PostList(ListView):
     ordering = '-date'
     template_name = 'news.html'
     context_object_name = 'all_news'
-    paginate_by = 3
+    paginate_by = 5
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -21,7 +21,8 @@ class PostList(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Добавляем в контекст объект фильтрации.
-        context['filterset'] = self.filterset
+        # context['filterset'] = self.filterset
+        context['essence'] = "новости и статьи"
         return context
 
 
@@ -31,12 +32,22 @@ class ArticlesList(PostList):
         self.filterset = PostFilters(self.request.GET, queryset)
         return self.filterset.qs.filter(essence='A')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['essence'] = "статьи"
+        return context
+
 
 class NewsList(PostList):
     def get_queryset(self):
         queryset = super().get_queryset()
         self.filterset = PostFilters(self.request.GET, queryset)
         return self.filterset.qs.filter(essence='N')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['essence'] = "новости"
+        return context
 
 
 class PostDetail(DetailView):
@@ -74,22 +85,29 @@ class NewsSearch(ListView):
 
 
 class PostCreate(CreateView):
-    # Указываем нашу разработанную форму
     form_class = PostForms
-    # модель товаров
     model = Post
-    # и новый шаблон, в котором используется форма.
     template_name = 'post_edit.html'
-
-    def form_valid(self, form):
-        post = form.save(commit=False)
-        post.essence = 'A'
-        print(post)
-        return super().form_valid(form)
 
 
 class NewsCreate(PostCreate):
-    success_url = reverse_lazy('news_list')
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.essence = 'N'
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('one_news', kwargs={'pk': self.object.id})
+
+
+class ArticlesCreate(PostCreate):
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.essence = 'A'
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('one_articles', kwargs={'pk': self.object.id})
 
 
 class PostEdit(UpdateView):
@@ -98,15 +116,17 @@ class PostEdit(UpdateView):
     template_name = 'post_edit.html'
 
 
+class NewsEdit(PostEdit):
+    def get_success_url(self):
+        return reverse('one_news', kwargs={'pk': self.kwargs['pk']})
+
+
+class ArticlesEdit(PostEdit):
+    def get_success_url(self):
+        return reverse('one_articles', kwargs={'pk': self.kwargs['pk']})
+
 def News(request):
     return redirect('/news/')
-
-# class NewsEdit(PostEdit):
-#     success_url = reverse_lazy('one_news')
-#
-#
-# class ArticlesEdit(PostEdit):
-#     success_url = reverse_lazy('one_articles')
 
 
 class PostDelete(DeleteView):

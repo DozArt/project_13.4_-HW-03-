@@ -16,6 +16,7 @@ class PostFilters(FilterSet):
 
         fields = {
             'header': ['icontains'],
+            'essence': ['exact'],
         }
 
     added_after = DateTimeFilter(

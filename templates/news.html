@@ -11,14 +11,19 @@ All_news
 
 <!-- В контенте на странице мы выводим все товары -->
 {% block content %}
-<h1>Все посты</h1>
+<h1>Все {{ essence }}</h1>
+<h2>
+    + <a href="create">добавить</a> +
+</h2>
+
+
 {% for news in all_news %}
 <hr>
-<h2>
+<h4>
     <a href="/{{news.essence|translate_essence}}/{{ news.id }}">
         {{ news.header|censor }}
     </a>
-</h2>
+</h4>
 <h5>{{ news.date|date:'d M Y' }}</h5>
 <p>{{ news.text|truncatewords:20|censor}}</p>
 {% endfor %}
