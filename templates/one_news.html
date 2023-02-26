@@ -13,6 +13,10 @@ Post
 <h1>{{ news.header|censor }}</h1>
 <h3>{{ news.date|date:'d M Y' }}</h3>
 <p>{{ news.text|censor }}</p>
-<a href="{{ news.id }}/delete/">Delete 🗑</a> |
-<a href="{{ news.id }}/edit/">Edit ✏</a>
+{% if perms.news.delete_post %}
+    <a href="{{ news.id }}/delete/">Delete 🗑</a>
+{% endif %}
+{% if perms.news.change_post %}
+    <a href="{{ news.id }}/edit/">Edit ✏</a>
+{% endif %}
 {% endblock content %}

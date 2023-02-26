@@ -12,10 +12,11 @@ All_news
 <!-- В контенте на странице мы выводим все товары -->
 {% block content %}
 <h1>Все {{ essence }}</h1>
-<h2>
-    + <a href="create">добавить</a> +
-</h2>
-
+{% if perms.news.add_post %}
+    <h2>
+        + <a href="create">добавить</a> +
+    </h2>
+{% endif %}
 
 {% for news in all_news %}
 <hr>

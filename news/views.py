@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -84,7 +85,9 @@ class NewsSearch(ListView):
         return context
 
 
-class PostCreate(CreateView):
+class PostCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.add_post',)
+    raise_exception = True
     form_class = PostForms
     model = Post
     template_name = 'post_edit.html'
@@ -110,7 +113,9 @@ class ArticlesCreate(PostCreate):
         return reverse('one_articles', kwargs={'pk': self.object.id})
 
 
-class PostEdit(UpdateView):
+class PostEdit(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news.change_post',)
+    raise_exception = True
     form_class = PostForms
     model = Post
     template_name = 'post_edit.html'
@@ -125,11 +130,14 @@ class ArticlesEdit(PostEdit):
     def get_success_url(self):
         return reverse('one_articles', kwargs={'pk': self.kwargs['pk']})
 
+
 def News(request):
-    return redirect('/news/')
+    return redirect('/news/create/')
 
 
-class PostDelete(DeleteView):
+class PostDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('news.delete_post',)
+    raise_exception = True
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('post_list')
