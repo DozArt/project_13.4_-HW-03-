@@ -11,7 +11,7 @@ All_news
 
 <!-- В контенте на странице мы выводим все товары -->
 {% block content %}
-<h1>Все {{ essence }}</h1>
+<h1>Все {{ essence }}: {{ count }}</h1>
 {% if perms.news.add_post %}
     <h2>
         + <a href="create">добавить</a> +
@@ -19,14 +19,19 @@ All_news
 {% endif %}
 
 {% for news in all_news %}
-<hr>
-<h4>
-    <a href="/{{news.essence|translate_essence}}/{{ news.id }}">
-        {{ news.header|censor }}
-    </a>
-</h4>
-<h5>{{ news.date|date:'d M Y' }}</h5>
-<p>{{ news.text|truncatewords:20|censor}}</p>
+    <hr>
+    <h4>
+        <a href="/{{news.essence|translate_essence}}/{{ news.id }}">
+            {{ news.header|censor }}
+        </a>
+    </h4>
+    <div class="text-secondary">
+    {% for category in news.category.all %}
+        {{ category }}
+    {% endfor %}
+    </div>
+    <div class="text-secondary">{{ news.date|date:'d M Y' }}</div>
+    <p>{{ news.text|truncatewords:20|censor}}</p>
 {% endfor %}
 
 {% if page_obj.has_previous %}

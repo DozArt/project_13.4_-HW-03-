@@ -1,5 +1,7 @@
 from django import forms
 from .models import Post
+from allauth.account.forms import SignupForm
+from django.core.mail import send_mail
 
 
 class PostForms(forms.ModelForm):
@@ -14,12 +16,15 @@ class PostForms(forms.ModelForm):
             'author',
         ]
 
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     header = cleaned_data.get("header")
-    #     if header is not None and len(header) < 20:
-    #         raise ValidationError({
-    #             "header": "Заголовок не может быть менее 20 символов."
-    #         })
-    #
-    #     return cleaned_data
+
+class CustomSignupForm(SignupForm):
+    def save(self, request):
+        user = super().save(request)
+
+        send_mail(
+            subject='Добро пожаловать в наш интернет-магазин!',
+            message=f'{user.username}, вы успешно зарегистрировались!',
+            from_email=None,  # будет использовано значение DEFAULT_FROM_EMAIL
+            recipient_list=[user.email],
+        )
+        return user

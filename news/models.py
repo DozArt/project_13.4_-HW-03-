@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse
 
 
 class Author(models.Model):
@@ -21,6 +22,7 @@ class Author(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    subscribers = models.ManyToManyField(User, through='Subscriber')
 
     def __str__(self):
         return self.name
@@ -61,8 +63,8 @@ class Post(models.Model):
     def __str__(self):
         return f'{self.date.strftime("%Y-%m-%d %H:%M")}, {self.header}, {self.text}'
 
-    # def get_absolute_url(self):
-    #     return reverse('post', args=[str(self.id)])
+    def get_absolute_url(self):
+        return reverse('post', args=[str(self.id)])
 
 
 class PostCategory(models.Model):
@@ -84,3 +86,21 @@ class Comment(models.Model):
     def dislike(self):
         self.rating -= 1
         self.save()
+
+
+# class Subscription(models.Model):
+#     user = models.ForeignKey(
+#         to=User,
+#         on_delete=models.CASCADE,
+#         related_name='subscriptions',
+#     )
+#     category = models.ForeignKey(
+#         to='Category',
+#         on_delete=models.CASCADE,
+#         related_name='subscriptions',
+#     )
+
+
+class Subscriber(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)

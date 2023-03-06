@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from news.views import subscriptions
+
 urlpatterns = [
    path('admin/', admin.site.urls),
    path('pages/', include('django.contrib.flatpages.urls')),
@@ -23,5 +25,5 @@ urlpatterns = [
    # Делаем так, чтобы все адреса из нашего приложения (simpleapp/urls.py)
    # подключались к главному приложению с префиксом products/.
    path('', include('news.urls')),
-
+   path('subscriptions/', subscriptions, name='subscriptions'),
 ]

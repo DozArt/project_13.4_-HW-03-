@@ -36,6 +36,9 @@
                             <a class="nav-link" href="{% url 'articles_list' %}">Articles</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{% url 'subscriptions' %}">Subscriptions 🕭</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{% url 'search' %}">Search🔍︎</a>
                         </li>
                         {% if user.is_authenticated %}
@@ -57,7 +60,7 @@
         <!-- Page content-->
         <div class="container">
             <div class="row">
-                <div class="col-lg-12 text-center">
+                <div class="col-lg-12 text-start">
                     {% block content %}
                     {{ flatpage.content }}
                     {% endblock content %}

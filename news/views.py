@@ -1,8 +1,11 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+from django.db.models import Exists, OuterRef
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Post
+from django.views.decorators.csrf import csrf_protect
+from .models import Post, Category, Subscriber
 from .filters import PostFilters
 from .forms import PostForms
 
@@ -23,6 +26,7 @@ class PostList(ListView):
         context = super().get_context_data(**kwargs)
         # Добавляем в контекст объект фильтрации.
         # context['filterset'] = self.filterset
+        context['count'] = str(self.model.objects.all().count())
         context['essence'] = "новости и статьи"
         return context
 
@@ -35,6 +39,7 @@ class ArticlesList(PostList):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['count'] = str(self.model.objects.filter(essence='A').count())
         context['essence'] = "статьи"
         return context
 
@@ -47,6 +52,7 @@ class NewsList(PostList):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['count'] = str(self.model.objects.filter(essence='N').count())
         context['essence'] = "новости"
         return context
 
@@ -141,3 +147,35 @@ class PostDelete(PermissionRequiredMixin, DeleteView):
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('post_list')
+
+
+@login_required
+@csrf_protect
+def subscriptions(request):
+    if request.method == 'POST':
+        category_id = request.POST.get('category_id')
+        category = Category.objects.get(id=category_id)
+        action = request.POST.get('action')
+
+        if action == 'subscribe':
+            Subscriber.objects.create(user=request.user, category=category)
+        elif action == 'unsubscribe':
+            Subscriber.objects.filter(
+                user=request.user,
+                category=category,
+            ).delete()
+
+    categories_with_subscriptions = Category.objects.annotate(
+        user_subscribed=Exists(
+            Subscriber.objects.filter(
+                user=request.user,
+                category=OuterRef('pk'),
+            )
+        )
+    ).order_by('name')
+    print(categories_with_subscriptions)
+    return render(
+        request,
+        'subscriptions.html',
+        {'categories': categories_with_subscriptions},
+    )
