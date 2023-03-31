@@ -113,6 +113,7 @@ class ArticlesCreate(PostCreate):
     def form_valid(self, form):
         post = form.save(commit=False)
         post.essence = 'A'
+        post.essence = 'A'
         return super().form_valid(form)
 
     def get_success_url(self):
