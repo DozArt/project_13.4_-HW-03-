@@ -4,7 +4,7 @@ import re
 register = template.Library()
 
 bad_words_file = open('bad_words.txt', 'r')  # файл в корне проекта NewsPaper
-bad_words = set(line.strip('\n') for line in open('bad_words.txt'))
+bad_words = set(line.strip('\n') for line in open('bad_words.txt', encoding = "utf8"))
 exp = '(\\b%s\\b)' % '\\b|\\b'.join(bad_words)  # Делаем маску учитывая начало и окончание слова
 r = re.compile(exp, re.IGNORECASE)  # компилируем маску игнорируя регистр
 
